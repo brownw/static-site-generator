@@ -60,9 +60,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         result = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
         expected = [
             TextNode("Plain text", TextType.TEXT),
-            TextNode("", TextType.TEXT),
             TextNode("bold", TextType.BOLD),
-            TextNode("", TextType.TEXT),
             TextNode("more text", TextType.TEXT)
         ]
         self.assertEqual(result, expected)
@@ -72,7 +70,6 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         old_nodes = [TextNode("**bold** text", TextType.TEXT)]
         result = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
         expected = [
-            TextNode("", TextType.TEXT),
             TextNode("bold", TextType.BOLD),
             TextNode(" text", TextType.TEXT)
         ]
@@ -84,8 +81,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         result = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
         expected = [
             TextNode("text ", TextType.TEXT),
-            TextNode("bold", TextType.BOLD),
-            TextNode("", TextType.TEXT)
+            TextNode("bold", TextType.BOLD)
         ]
         self.assertEqual(result, expected)
 
@@ -94,11 +90,9 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         old_nodes = [TextNode("**bold** and **more**", TextType.TEXT)]
         result = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
         expected = [
-            TextNode("", TextType.TEXT),
             TextNode("bold", TextType.BOLD),
             TextNode(" and ", TextType.TEXT),
-            TextNode("more", TextType.BOLD),
-            TextNode("", TextType.TEXT)
+            TextNode("more", TextType.BOLD)
         ]
         self.assertEqual(result, expected)
 
@@ -157,6 +151,54 @@ class TestSplitNodesDelimiter(unittest.TestCase):
                 TextNode(
                    "link", TextType.LINK, "https://i.imgur.com/3elNhQu.png"
                 ),
+            ],
+            new_nodes,
+        )
+    
+    def test_text_to_textnodes(self):
+        text = \
+        "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        new_nodes = text_to_textnodes(text)
+        self.maxDiff = None
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            new_nodes,
+        )
+    
+    def test_plain_text_only(self):
+        text = "plain text only"
+        new_nodes = text_to_textnodes(text)
+        self.maxDiff = None
+        self.assertListEqual(
+            [
+                TextNode("plain text only", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+
+    def test_italic_bold_code(self):
+        text = "Some _italic_ and **bold** and `code`"
+        new_nodes = text_to_textnodes(text)
+        self.maxDiff = None
+        self.assertListEqual(
+            [
+                TextNode("Some ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("code", TextType.CODE)
             ],
             new_nodes,
         )

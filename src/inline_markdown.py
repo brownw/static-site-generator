@@ -16,7 +16,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             chunks = node.text.split(delimiter)
             for idx, chunk in enumerate(chunks):
                 if idx % 2 == 0:
-                    new_nodes.append(TextNode(chunk,TextType.TEXT))
+                    if chunk != "":
+                        new_nodes.append(TextNode(chunk,TextType.TEXT))
                 else:
                     new_nodes.append(TextNode(chunk,text_type))    
         else:
@@ -43,6 +44,7 @@ def split_nodes_image(old_nodes):
 
         if not images:
             new_nodes.append(node)
+            continue
     
         for image in images:
             image_alt, image_url = image
@@ -75,6 +77,7 @@ def split_nodes_link(old_nodes):
 
         if not links:
             new_nodes.append(node)
+            continue
     
         for link in links:
             link_text, link_url = link
@@ -91,4 +94,13 @@ def split_nodes_link(old_nodes):
         
         if original_text != "":
             new_nodes.append(TextNode(original_text, TextType.TEXT))
+    return new_nodes
+
+def text_to_textnodes(text):
+    start = TextNode(text, TextType.TEXT)
+    new_nodes = split_nodes_delimiter([start], '**', TextType.BOLD)
+    new_nodes = split_nodes_delimiter(new_nodes, "_", TextType.ITALIC)
+    new_nodes = split_nodes_delimiter(new_nodes, "`", TextType.CODE)
+    new_nodes = split_nodes_image(new_nodes)
+    new_nodes = split_nodes_link(new_nodes)
     return new_nodes
