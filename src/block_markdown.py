@@ -20,7 +20,7 @@ def markdown_to_blocks(markdown):
 def block_to_block_type(block):
     if re.match(r"^#{1,6}\s.+", block):
        return BlockType.HEADING
-    elif re.match(r"^```\n[\s\S]*?^```", block):
+    elif re.match(r"^```\n[\s\S]*?^```", block,re.MULTILINE):
         return BlockType.CODE
     elif re.match(r"^(?:>\s.*\n?)+", block):
         return BlockType.QUOTE

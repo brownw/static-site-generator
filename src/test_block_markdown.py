@@ -51,5 +51,23 @@ Another block.
             [],
         )
 
+class TestBlockToBlockType(unittest.TestCase):
+    def test_heading(self):
+        self.assertEqual(block_to_block_type("# Heading"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("### Level 3"), BlockType.HEADING)
+
+    def test_code(self):
+        self.assertEqual(block_to_block_type("```\ncode\n```"), BlockType.CODE)
+
+    def test_quote(self):
+        self.assertEqual(block_to_block_type("> quote\n> more"), BlockType.QUOTE)
+
+    def test_ordered_list(self):
+        self.assertEqual(block_to_block_type("1. item\n2. item"), BlockType.ORDERED_LIST)
+
+    def test_paragraph(self):
+        self.assertEqual(block_to_block_type("Just a normal block of text."), BlockType.PARAGRAPH)
+
+
 if __name__ == "__main__":
     unittest.main()
