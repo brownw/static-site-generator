@@ -30,3 +30,20 @@ def block_to_block_type(block):
         return BlockType.ORDERED_LIST
     else:
         return BlockType.PARAGRAPH
+
+def markdown_to_html_node(document):
+    blocks = markdown_to_blocks(document)
+    html_nodes = []
+    for block in blocks:
+        type = block_to_block_type(block)
+        # 2. Based on type of block create a new HTMLNode
+        # 3. Assign the proper child HTMLNode objects to the block node. Maybe:
+        #  create a shared text_to_children(text) function that works for all block types. 
+        #  It takes a string of text and returns a list of HTMLNodes that represent the inline markdown using previously created functions 
+        # (think TextNode -> HTMLNode)
+        # 4. The "code" block is a bit of a special case: 
+        # it should not do any inline markdown parsing of its children. 
+        # I didn't use my text_to_children function for this block type, 
+        # I manually made a TextNode and used text_node_to_html_node.
+    # 5 Create a parent div HTMLNode and make all the block nodes children under it and return
+    
