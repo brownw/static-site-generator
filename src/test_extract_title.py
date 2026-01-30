@@ -9,5 +9,10 @@ class TestExtractTitle(unittest.TestCase):
         title = "This is a title"
         self.assertEqual(extract_title(md), title)
 
+    def test_multiline_title(self):
+        md = "# This is a title \n test"
+        title = "This is a title"
+        self.assertEqual(extract_title(md), title)
+
 if __name__ == "__main__":
     unittest.main()
