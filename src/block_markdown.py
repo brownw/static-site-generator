@@ -73,13 +73,23 @@ def list_block_to_children(block, ordered):
         if ordered:
             stripped = strip_ordered_marker(line)
             children = text_to_children(stripped)
-            li_nodes.append(HTMLNode("li", children=children))
+            li_nodes.append(ParentNode("li", children=children))
         else:
-            stripped = strip_ordered_marker(line)
+            stripped = strip_unordered_marker(line)
             children = text_to_children(stripped)
-            li_nodes.append(HTMLNode("li", children=children))
+            li_nodes.append(ParentNode("li", children=children))
     return li_nodes
 
+def quote_to_html_node(block):
+    lines = block.split("\n")
+    new_lines = []
+    for line in lines:
+        if not line.startswith(">"):
+            raise ValueError("invalid quote block")
+        new_lines.append(line.lstrip(">").strip())
+    content = " ".join(new_lines)
+    children = text_to_children(content)
+    return ParentNode("blockquote", children)
 
 def code_block_to_html(block):
     lines = block.split("\n")
@@ -107,7 +117,7 @@ def markdown_to_html_node(document):
             case BlockType.CODE:
                 html_node = ParentNode("pre", children=[code_block_to_html(block)])
             case BlockType.QUOTE:
-                html_node = ParentNode("blockquote",children=[])
+                html_node = quote_to_html_node(block)
             case BlockType.UNORDERED_LIST:
                 html_node = ParentNode("ul",children=list_block_to_children(block, ordered=False))
             case BlockType.ORDERED_LIST:
