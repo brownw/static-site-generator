@@ -10,7 +10,7 @@ def extract_title(markdown):
         heading = match.group(1)
     return heading.strip()
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     #Print a message like "Generating page from from_path to dest_path using template_path".
     #Read the markdown file at from_path and store the contents in a variable.
@@ -24,7 +24,7 @@ def generate_page(from_path, template_path, dest_path):
         template = template_file.read()
         template_file.close()
         
-        #Use your markdown_to_html_node function and .to_html() method to convert the markdown file to an HTML string.
+        #Use your markdown_to_html_node function and .to_html() method to conveourt the markdown file to an HTML string.
         html_node = markdown_to_html_node(source)
         html_text = html_node.to_html()
         #print(f"html_text: {html_node.to_html()}")
@@ -32,6 +32,9 @@ def generate_page(from_path, template_path, dest_path):
         title = extract_title(source)
         output_text = template.replace("{{ Title }}", title)
         output_text = output_text.replace("{{ Content }}", html_text)
+        output_text = output_text.replace("href=\"/", f"href=\"{basepath}")
+        output_text = output_text.replace("src=\"/", f"src=\"{basepath}")
+        
         #Replace the {{ Title }} and {{ Content }} placeholders in the template with the HTML and title you generated.
         #Write the new full HTML page to a file at dest_path. Be sure to create any necessary directories if they don't exist.
         dest_dir = os.path.dirname(dest_path)
@@ -47,7 +50,7 @@ def generate_page(from_path, template_path, dest_path):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     content_root = Path(dir_path_content)
     dest_root = Path(dest_dir_path)
     
@@ -56,4 +59,4 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         rel_path = md_file.relative_to(content_root)
         dest_path = dest_root / rel_path.with_suffix(".html")
         
-        generate_page(str(md_file), template_path, str(dest_path))
+        generate_page(str(md_file), template_path, str(dest_path), basepath)
