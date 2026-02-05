@@ -1,5 +1,6 @@
 import re
 import os
+from pathlib import Path
 from block_markdown import *
 
 def extract_title(markdown):
@@ -17,7 +18,7 @@ def generate_page(from_path, template_path, dest_path):
         from_file = open(from_path)
         source = from_file.read()
         from_file.close() 
-        print(f"{source}")
+        #print(f"{source}")
         #Read the template file at template_path and store the contents in a variable.
         template_file = open(template_path)
         template = template_file.read()
@@ -45,3 +46,14 @@ def generate_page(from_path, template_path, dest_path):
         print(f"Value error: {e}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    content_root = Path(dir_path_content)
+    dest_root = Path(dest_dir_path)
+    
+    for md_file in content_root.rglob("*.md"):
+        # Calculate the destination path relative to the destination root
+        rel_path = md_file.relative_to(content_root)
+        dest_path = dest_root / rel_path.with_suffix(".html")
+        
+        generate_page(str(md_file), template_path, str(dest_path))
